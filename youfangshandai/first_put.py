@@ -1,4 +1,4 @@
-import urllib3
+import requests
 import json
 import pika
 import certifi
@@ -11,24 +11,22 @@ class Construction(object):
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue='yfsd_construction')
         self.city_dict = {
-            '哈尔滨': 'https://yfsdhrb.cmbc.com.cn',
-            '苏州': 'https://yfsdsuz.cmbc.com.cn',
             '北京': 'https://bjset.cmbc.com.cn',
             '武汉': 'https://yfsdwh.cmbc.com.cn',
             '石家庄': 'https://yfsdsjz.cmbc.com.cn',
-            '成都': 'https://yfsdchd.cmbc.com.cn',
             '郑州': 'https://yfsdzz.cmbc.com.cn',
-            '合肥': 'https://yfsdhf.cmbc.com.cn',
             '南昌': 'https://yfsdnac.cmbc.com.cn',
             '福州': 'https://yfsdfuz.cmbc.com.cn',
-            '杭州': 'https://yfsdhaz.cmbc.com.cn',
             '兰州': 'https://yfsdlaz.cmbc.com.cn',
             '呼和浩特': 'https://yfsdhuh.cmbc.com.cn',
             '宁波': 'https://yfsdnib.cmbc.com.cn',
             '贵阳': 'https://yfsdguy.cmbc.com.cn',
-            '温州': 'https://yfsdwez.cmbc.com.cn',
+            '哈尔滨': 'https://yfsdhrb.cmbc.com.cn',
             '昆明': 'https://yfsdkum.cmbc.com.cn',
-            '济南': 'https://yfsdjin.cmbc.com.cn'
+            '太原': 'https://yfsdtay.cmbc.com.cn',
+            '苏州': 'https://yfsdsuz.cmbc.com.cn',
+            '杭州': 'https://yfsdhaz.cmbc.com.cn',
+            '温州': 'https://yfsdwez.cmbc.com.cn',
         }
 
         self.headers = {
@@ -36,7 +34,6 @@ class Construction(object):
         }
 
         # 直接用本机请求
-        self.http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
         self.count = 0
 
     def get_constructionId(self):
@@ -46,13 +43,8 @@ class Construction(object):
                 data = {'keyworks': '', 'pageNo': '1', 'pageSize': '100000'}
                 city_url = self.city_dict[city]
                 url = city_url + '/wxp/yfsd/queryBuildingByPage'
-                response = self.http.request(
-                    'POST',
-                    url,
-                    fields=data,
-                    headers=self.headers
-                )
-                constructionId_info = json.loads(response.data.decode())
+                response = requests.post(url=url,data=data,headers=self.headers,verify=False)
+                constructionId_info = json.loads(response.text)
                 for con in constructionId_info['resultData']:
                     """
                     con
@@ -78,17 +70,20 @@ class Construction(object):
                         'con_id': con_id,
                         'city': city,
                     }
+                    print(data)
                     # 放入队列
-                    # self.channel.basic_publish(exchange='',
-                    #                            routing_key='yfsd_construction',
-                    #                            body=json.dumps(data))
-                    # self.count = self.count + 1
-                    # print('放入队列%s次' % self.count)
+                    self.channel.basic_publish(exchange='',
+                                               routing_key='yfsd_construction',
+                                               body=json.dumps(data))
+                    self.count = self.count + 1
+                    print('放入队列%s次' % self.count)
 
             except Exception as e:
                 print(e)
                 continue
         self.connection.close()
+
+
 if __name__ == '__main__':
     print('')
     con = Construction()

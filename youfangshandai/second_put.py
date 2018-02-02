@@ -42,11 +42,11 @@ class BuildingId:
                         "city_url": city_url,
                         'city': city,
                     }
+                    print(data)
                     self.channel.queue_declare(queue='yfsd_building')
                     self.channel.basic_publish(exchange='',
                                                routing_key='yfsd_building',
                                                body=json.dumps(data))
-                    print('插入一条数据')
         else:
             print("-" * 30)
             print(body)
@@ -54,14 +54,11 @@ class BuildingId:
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def consume_start(self):
-
-        # 类似权重，按能力分发，如果有一个消息，就不在给你发
+        # 类似权重，按能力分发
         self.channel.basic_qos(prefetch_count=1)
-        # 消费消息
         self.channel.basic_consume(self.callback,
                                    queue='yfsd_construction',
                                    )
-
         self.channel.start_consuming()
 
 if __name__ == '__main__':
