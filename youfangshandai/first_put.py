@@ -90,5 +90,6 @@ class Construction(object):
                 continue
         self.connection.close()
 if __name__ == '__main__':
+    print('')
     con = Construction()
     con.get_constructionId()
