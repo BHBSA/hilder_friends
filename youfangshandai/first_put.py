@@ -11,21 +11,21 @@ class Construction(object):
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue='yfsd_construction')
         self.city_dict = {
-            '北京': 'https://bjset.cmbc.com.cn',
-            '武汉': 'https://yfsdwh.cmbc.com.cn',
-            '石家庄': 'https://yfsdsjz.cmbc.com.cn',
-            '郑州': 'https://yfsdzz.cmbc.com.cn',
-            '南昌': 'https://yfsdnac.cmbc.com.cn',
-            '福州': 'https://yfsdfuz.cmbc.com.cn',
-            '兰州': 'https://yfsdlaz.cmbc.com.cn',
-            '呼和浩特': 'https://yfsdhuh.cmbc.com.cn',
-            '宁波': 'https://yfsdnib.cmbc.com.cn',
-            '贵阳': 'https://yfsdguy.cmbc.com.cn',
-            '哈尔滨': 'https://yfsdhrb.cmbc.com.cn',
-            '昆明': 'https://yfsdkum.cmbc.com.cn',
-            '太原': 'https://yfsdtay.cmbc.com.cn',
-            '苏州': 'https://yfsdsuz.cmbc.com.cn',
-            '杭州': 'https://yfsdhaz.cmbc.com.cn',
+            # '北京': 'https://bjset.cmbc.com.cn',
+            # '武汉': 'https://yfsdwh.cmbc.com.cn',
+            # '石家庄': 'https://yfsdsjz.cmbc.com.cn',
+            # '郑州': 'https://yfsdzz.cmbc.com.cn',
+            # '南昌': 'https://yfsdnac.cmbc.com.cn',
+            # '福州': 'https://yfsdfuz.cmbc.com.cn',
+            # '兰州': 'https://yfsdlaz.cmbc.com.cn',
+            # '呼和浩特': 'https://yfsdhuh.cmbc.com.cn',
+            # '宁波': 'https://yfsdnib.cmbc.com.cn',
+            # '贵阳': 'https://yfsdguy.cmbc.com.cn',
+            # '哈尔滨': 'https://yfsdhrb.cmbc.com.cn',
+            # '昆明': 'https://yfsdkum.cmbc.com.cn',
+            # '太原': 'https://yfsdtay.cmbc.com.cn',
+            # '苏州': 'https://yfsdsuz.cmbc.com.cn',
+            # '杭州': 'https://yfsdhaz.cmbc.com.cn',
             '温州': 'https://yfsdwez.cmbc.com.cn',
         }
 
@@ -85,6 +85,5 @@ class Construction(object):
 
 
 if __name__ == '__main__':
-    print('')
     con = Construction()
     con.get_constructionId()

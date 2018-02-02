@@ -66,18 +66,13 @@ class HouseId(object):
 
     def consume_start(self):
         pool_list.append(os.getpid())
-        # 类似权重，按能力分发，如果有一个消息，就不在给你发
         self.channel.basic_qos(prefetch_count=1)
-        # 消费消息
         self.channel.basic_consume(self.callback,
-                                   queue='yfsd_building',
-                                   # no_ack=True  # 写的话，如果接收消息，机器宕机消息就丢了
-                                   # # 一般不写。宕机则生产者检测到发给其他消费者
-                                   )
+                                   queue='yfsd_building')
         self.channel.start_consuming()
 
 
 if __name__ == '__main__':
     worker = HouseId()
-    for i in range(100):
+    for i in range(10):
         Process(target=worker.consume_start).start()
