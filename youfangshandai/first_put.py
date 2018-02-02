@@ -85,5 +85,6 @@ class Construction(object):
 
 
 if __name__ == '__main__':
+    print('')
     con = Construction()
     con.get_constructionId()
