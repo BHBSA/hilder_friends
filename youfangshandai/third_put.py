@@ -17,7 +17,7 @@ class HouseId(object):
     channel = connection.channel()
     channel.queue_declare(queue='yfsd_building')
     # 设置代理IP
-    proxy = urllib3.ProxyManager('http://192.168.0.100:4234/', cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+    proxy = urllib3.ProxyManager('http://192.168.0.94:4234/', cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
     # 设置请求头
     headers = {
@@ -60,8 +60,7 @@ class HouseId(object):
                 ch.basic_ack(delivery_tag=method.delivery_tag)
             except Exception as e:
                 print(e,buildingId)
-                # self.callback(ch,method,properties,body=json.dumps(body).encode())
-        # 告诉生产者，消息处理完成
+
 
 
     def consume_start(self):
