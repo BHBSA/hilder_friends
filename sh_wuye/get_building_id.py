@@ -4,6 +4,7 @@ import pika
 from multiprocessing import Process
 import json
 
+
 # 门牌号 接口
 # url = 'https://www.962121.net/wyweb/962121appyzbx/v7/sect/getUnitListSDO.do'
 # payload = "--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"sect_id\"\r\n\r\n{0}\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"currentPage\"\r\n\r\n1\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"pageSize\"\r\n\r\n20\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"select\"\r\n\r\n\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"au_name\"\r\n\r\n15021630956\r\n--0xKhTmLbOuNdArY--".format(sect_id)
@@ -17,7 +18,7 @@ def connect_mongodb(host, port, database, collection):
 
 
 def connect_rabbit(host, queue):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, ))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host, 5673))
     channel = connection.channel()
     channel.queue_declare(queue=queue)
     return channel
@@ -39,7 +40,7 @@ headers = {
 def callback(ch, method, properties, body):
     community_id = body.decode()
     url = 'https://www.962121.net/wyweb/962121appyzbx/v7/sect/getUnitListSDO.do'
-    payload = "--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"sect_id\"\r\n\r\n{0}\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"currentPage\"\r\n\r\n1\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"pageSize\"\r\n\r\n20\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"select\"\r\n\r\n\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"au_name\"\r\n\r\n15021630956\r\n--0xKhTmLbOuNdArY--".format(
+    payload = "--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"sect_id\"\r\n\r\n{0}\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"currentPage\"\r\n\r\n1\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"pageSize\"\r\n\r\n10000\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"select\"\r\n\r\n\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"au_name\"\r\n\r\n15021630956\r\n--0xKhTmLbOuNdArY--".format(
         community_id)
     try:
         response = requests.post(url=url, headers=headers, data=payload, verify=False, proxies=proxies)

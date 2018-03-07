@@ -13,7 +13,7 @@ def connect_mongodb(host, port, database, collection):
 
 
 def connect_rabbit(host, queue):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, ))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host, 5673))
     channel = connection.channel()
     channel.queue_declare(queue=queue)
     return channel
@@ -24,7 +24,7 @@ headers = {
     'Content-Type': 'multipart/form-data; charset=gb18030; boundary=0xKhTmLbOuNdArY'
 }
 proxies = {
-    'https': '192.168.0.90:4234'
+    'https': '192.168.0.96:4234'
 }
 url = 'https://www.962121.net/wyweb/962121appyzbx/v7/sect/getHouListSDO.do'
 
@@ -39,11 +39,11 @@ def callback(ch, method, properties, body):
     unit_id = data['unit_id']
     unit_addr = data['unit_addr']
     sect_id = data['sect_id']
-    payload = "--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"currentPage\"\r\n\r\n1\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"unit_id\"\r\n\r\n{0}\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"select\"\r\n\r\n\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"pageSize\"\r\n\r\n20\r\n--0xKhTmLbOuNdArY--".format(
+    payload = "--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"currentPage\"\r\n\r\n1\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"unit_id\"\r\n\r\n{0}\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"select\"\r\n\r\n\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"pageSize\"\r\n\r\n1000\r\n--0xKhTmLbOuNdArY--".format(
         unit_id)
     try:
-        response = requests.post(url=url, headers=headers, data=payload, verify=False, proxies=proxies)
-        data = response.text
+        response = requests.post(url=url, headers=headers, data=payload, verify=False,)
+        data = response.json()
         print(data)
         message = data['message']
         print(message)
@@ -81,5 +81,5 @@ def consume_queue():
 
 
 if __name__ == '__main__':
-    for i in range(10):
+    for i in range(60):
         Process(target=consume_queue).start()

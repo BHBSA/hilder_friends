@@ -2,6 +2,7 @@ import requests
 import pymongo
 import pika
 from multiprocessing import Process
+
 headers = {
     'User-Agent': 'IOS-wuye/360;iOS;11.1.2;iPhone',
     'Content-Type': 'multipart/form-data; charset=gb18030; boundary=0xKhTmLbOuNdArY'
@@ -16,10 +17,11 @@ def connect_mongodb(host, port, database, collection):
 
 
 def connect_rabbit(host, queue):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, ))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host, 5673))
     channel = connection.channel()
     channel.queue_declare(queue=queue)
     return channel
+
 
 # 详情页 接口
 url = 'https://www.962121.net/wyweb/962121appyzbx/v7/sect/getSectSDO.do'
