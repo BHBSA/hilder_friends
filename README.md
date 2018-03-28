@@ -1,9 +1,5 @@
 **How to run?**
 --
-<h4>优房闪贷，房估估，上海物业
-
-cd /hilder_friends/python run.py
-
 **where are save**
 --
 + <h5>优房闪贷：
@@ -88,7 +84,10 @@ cd /hilder_friends/python run.py
     + building_name  == 楼栋名字
     + building_type  == 楼栋类型
 
----
+<h4>优房闪贷，房估估，上海物业
+
+python run.py
+
 
 
 
