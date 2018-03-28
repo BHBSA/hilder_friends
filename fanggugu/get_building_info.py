@@ -41,7 +41,7 @@ class GetBuild(object):
         try:
             while True:
                 data = {"app_name": 'fgg'}
-                ip = requests.post(url='http://192.168.10.85:8999/get_one_proxy', data=data).text
+                ip = requests.post(url='http://192.168.0.235:8999/get_one_proxy', data=data).text
                 print(ip)
                 proxies = {'http': ip}
                 try:
@@ -57,7 +57,7 @@ class GetBuild(object):
                     break
                 except Exception as e:
                     formdata = {"app_name": 'fgg', "status_code": 1, "ip": ip}
-                    response = requests.post(url='http://192.168.10.85:8999/send_proxy_status', data=formdata)
+                    response = requests.post(url='http://192.168.0.235:8999/send_proxy_status', data=formdata)
                     status = response.text
                     print(status)
 

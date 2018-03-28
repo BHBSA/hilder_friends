@@ -14,7 +14,7 @@ class Login(object):
                  'remembermeVal': 0}
         while True:
             data = {"app_name": 'fgg'}
-            ip = requests.post(url='http://192.168.10.85:8999/get_one_proxy', data=data).text
+            ip = requests.post(url='http://192.168.0.235:8999/get_one_proxy', data=data).text
             print(ip)
             proxies = {'http': ip}
             try:
@@ -24,7 +24,7 @@ class Login(object):
                 return jrbqiantai
             except Exception as e:
                 formdata = {"app_name": 'fgg', "status_code": 1, "ip": ip}
-                response = requests.post(url='http://192.168.10.85:8999/send_proxy_status', data=formdata, timeout=5)
+                response = requests.post(url='http://192.168.0.235:8999/send_proxy_status', data=formdata, timeout=5)
                 status = response.text
                 print('更新' + status)
 
