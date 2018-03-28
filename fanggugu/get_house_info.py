@@ -116,4 +116,4 @@ if __name__ == '__main__':
     house = GetHouse()
     for i in coll_user.find():
         user_name = i['user_name']
-        Process(target=house.consume_queue, args=(user_name,)).start()
+        house.consume_queue(user_name)
