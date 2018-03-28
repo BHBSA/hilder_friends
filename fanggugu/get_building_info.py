@@ -1,7 +1,7 @@
 import requests
 import json
 from multiprocessing import Process
-from login_fgg import Login
+from fanggugu.login_fgg import Login
 from lib.mongo import Mongo
 from lib.rabbitmq import Rabbit
 
