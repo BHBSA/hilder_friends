@@ -2,6 +2,7 @@ import pymongo
 import pika
 import json
 
+
 def connect_mongodb(host, port, database, collection):
     client = pymongo.MongoClient(host, port)
     db = client[database]
@@ -10,7 +11,7 @@ def connect_mongodb(host, port, database, collection):
 
 
 def connect_rabbit(host, queue):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, ))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, port=5673))
     channel = connection.channel()
     channel.queue_declare(queue=queue)
     return channel
@@ -22,8 +23,8 @@ for i in coll_com.find():
     ResidentialAreaID = i['ResidentialAreaID']
     city_name = i['city_name']
     data = {
-        'ResidentialAreaID':ResidentialAreaID,
-        'city_name':city_name,
+        'ResidentialAreaID': ResidentialAreaID,
+        'city_name': city_name,
     }
     print(data)
     channel.basic_publish(exchange='',

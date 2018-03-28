@@ -1,74 +1,40 @@
 import requests
-import pymongo
 import time
 import json
-import pika
 from multiprocessing import Process
-import random
+from fanggugu.login_fgg import Login
+from lib.mongo import Mongo
+from lib.rabbitmq import Rabbit
 
-ips = [
-    "192.168.0.90:4234",
-    "192.168.0.93:4234",
-    "192.168.0.94:4234",
-    "192.168.0.96:4234",
-    "192.168.0.98:4234",
-    "192.168.0.99:4234",
-    "192.168.0.100:4234",
-    "192.168.0.101:4234",
-    "192.168.0.102:4234",
-    "192.168.0.103:4234"
-]
+# 连接mongodb
+m = Mongo('192.168.0.235', 27017)
+connection = m.get_connection()
+coll_insert = m.get_connection()['fgg']['fanggugu_house']
+coll_login = m.get_connection()['fgg']['login']
+coll_user = m.get_connection()['fgg']['user_info']
 
-
-def connect_mongodb(host, port, database, collection):
-    client = pymongo.MongoClient(host, port)
-    db = client[database]
-    coll = db.get_collection(collection)
-    return coll
+# 连接rabbit mq
+r = Rabbit('192.168.0.235', 5673)
+channel = r.get_channel()
+channel.queue_declare(queue='fgg_building_id')
 
 
-def connect_rabbit(host, queue):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, ))
-    channel = connection.channel()
-    channel.queue_declare(queue=queue)
-    return channel
+class GetHouse(object):
+    def __init__(self):
+        self.login = Login()
 
-
-def login(ip, user_id):
-    s = requests.session()
-    parms = {'pwd_login_username': user_id,
-             'pwd_login_password': '4ac9fa21a775e4239e4c72317cdca870',
-             'remembermeVal': 0}
-    proxies = {
-        'http': ip
-    }
-    s.get(url='http://www.fungugu.com/DengLu/doLogin_noLogin', params=parms,
-          proxies=proxies)
-    jrbqiantai = s.cookies.get_dict()['jrbqiantai']
-    return jrbqiantai
-
-
-class get_building_info(object):
-    coll_insert = connect_mongodb('192.168.0.235', 27017, 'fgg', 'fanggugu_building')
-    channel = connect_rabbit('192.168.0.235', 'fgg_community_id')
-
-    def __init__(self, ip, user_id):
-        self.ip = ip
-        self.user_id = user_id
-        self.proxies = {'http': self.ip}
-
-    def start_building_info(self, ch, method, properties, body):
-        cookie_ = method.consumer_tag
+    def start_house_info(self, ch, method, properties, body):
+        user_name = method.consumer_tag
+        jrbqiantai = coll_login.find({'user_name': user_name})
         headers = {
-            'Cookie': 'jrbqiantai=' + cookie_,
+            'Cookie': 'jrbqiantai=' + jrbqiantai,
             'Referer': 'http://www.fungugu.com/JinRongGuZhi/toJinRongGuZhi_s?xqmc=DongHuVillas&gjdx=DongHuVillas&residentialName=&realName=&dz=&xzq=%E9%95%BF%E5%AE%81%E5%8C%BA&xqid=22013&ldid=&dyid=&hid=&loudong=&danyuan=&hu=&retrievalMethod=%E6%99%AE%E9%80%9A%E6%A3%80%E7%B4%A2',
             'User-Agent': "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 UBrowser/4.0.3214.0 Safari/537.36",
         }
         message = json.loads(body.decode())
         ResidentialAreaID = message['ResidentialAreaID']
-        city_name = message['city_name']
+        city_name = message['city']
         building_id = message['building_id']
-        print(building_id, city_name)
         url = 'http://www.fungugu.com/JinRongGuZhi/getLiandong'
         params = {
             'city': city_name,
@@ -76,9 +42,33 @@ class get_building_info(object):
             'type': 'danyuan'
         }
         try:
-            time.sleep(5)
-            response = requests.post(url=url, headers=headers, params=params,
-                                     proxies=self.proxies)
+            while True:
+                # 获取ip
+
+                data = {"app_name": 'fgg'}
+                try:
+                    ip = requests.post(url='http://192.168.10.85:8999/get_one_proxy', data=data).text
+                    proxies = {'http': ip}
+                except Exception as e:
+                    print(e)
+                try:
+                    response = requests.post(url=url, headers=headers, params=params,
+                                             proxies=proxies)
+                    print(response.text)
+                    # 登录失效，重新登录
+                    if 'login' in response.text:
+                        jrbqiantai = self.login.update_mongo(user_name)
+                        headers['Cookie'] = 'jrbqiantai=' + jrbqiantai
+                        response = requests.post(url=url, headers=headers, params=params,
+                                                 proxies=proxies)
+                    break
+                except Exception as e:
+                    print(e)
+                    formdata = {"app_name": 'fgg', "status_code": 1, "ip": ip}
+                    response = requests.post(url='http://192.168.10.85:8999/send_proxy_status', data=formdata)
+                    status = response.text
+                    print('更新' + status)
+
             if 'true' or 'True' in response.text:
                 house_list = json.loads(response.text)['list']
                 if not house_list:
@@ -86,40 +76,46 @@ class get_building_info(object):
                     ch.basic_ack(delivery_tag=method.delivery_tag)
                     return
                 for i in house_list:
-                    print(i)
-                    building_id = i['id']
-                    building_name = i['name']
-                    building_type = i['type']
+                    house_id = i['id']
+                    house_name = i['name']
+                    house_type = i['type']
                     data = {
+                        'house_id': house_id,
+                        'house_name': house_name,
+                        'ResidentialAreaID': ResidentialAreaID,
+                        'city_name': city_name,
+                        'house_type': house_type,
                         'building_id': building_id,
-                        'building_name': building_name,
-                        'building_type': building_type,
                     }
-                    self.channel.basic_publish(exchange='',
-                                               routing_key='fgg_building_id',
-                                               body=json.dumps(data),
-                                               )
+                    print(data)
+                    coll_insert.insert_one(data)
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+            else:
+                channel.basic_publish(exchange='',
+                                      routing_key='fgg_building_id',
+                                      body=body,
+                                      )
                 ch.basic_ack(delivery_tag=method.delivery_tag)
         except Exception as e:
-            print('页面错误')
-            self.channel.basic_publish(exchange='',
-                                       routing_key='fgg_building_id',
-                                       body=body,
-                                       )
+            print(e)
+            channel.basic_publish(exchange='',
+                                  routing_key='fgg_building_id',
+                                  body=body,
+                                  )
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    def consume_queue(self, cookie):
-        self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(consumer_callback=self.start_building_info, queue='fgg_building_id',
-                                   consumer_tag=cookie)
-        self.channel.start_consuming()
+    def consume_queue(self, user_name):
+        channel.basic_qos(prefetch_count=1)
+        channel.basic_consume(consumer_callback=self.start_house_info, queue='fgg_building_id',
+                              consumer_tag=user_name)
+        channel.start_consuming()
 
 
 if __name__ == '__main__':
-    coll = connect_mongodb('192.168.0.235', 27017, 'fgg', 'user_info').find({})
-    for i in coll:
-        user_id = i['user_name']
-        ip = random.choice(ips)
-        cookie = login(ip, user_id)
-        com = get_building_info(ip=ip, user_id=user_id)
-        Process(target=com.consume_queue, args=(cookie,)).start()
+    login = Login()
+    status = login.put_mongo()
+    print(status)
+    house = GetHouse()
+    for i in coll_user.find():
+        user_name = i['user_name']
+        Process(target=house.consume_queue, args=(user_name,)).start()
