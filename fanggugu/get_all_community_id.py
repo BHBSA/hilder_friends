@@ -19,15 +19,18 @@ def connect_rabbit(host, queue):
 
 coll_com = connect_mongodb('192.168.0.235', 27017, 'fgg', 'fanggugu_price')
 channel = connect_rabbit('192.168.0.235', 'fgg_community_id')
-for i in coll_com.find():
-    ResidentialAreaID = i['ResidentialAreaID']
-    city_name = i['city_name']
-    data = {
-        'ResidentialAreaID': ResidentialAreaID,
-        'city_name': city_name,
-    }
-    print(data)
-    channel.basic_publish(exchange='',
-                          routing_key='fgg_community_id',
-                          body=json.dumps(data),
-                          )
+
+
+def produce():
+    for i in coll_com.find():
+        ResidentialAreaID = i['ResidentialAreaID']
+        city_name = i['city_name']
+        data = {
+            'ResidentialAreaID': ResidentialAreaID,
+            'city_name': city_name,
+        }
+        print(data)
+        channel.basic_publish(exchange='',
+                              routing_key='fgg_community_id',
+                              body=json.dumps(data),
+                              )

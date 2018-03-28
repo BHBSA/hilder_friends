@@ -6,7 +6,7 @@ import certifi
 
 class BuildingId:
     # 建立实例，声明管道，声明队列
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.0.235', ))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.0.235', port=5673))
     channel = connection.channel()
     channel.queue_declare(queue='yfsd_construction')
 
@@ -60,6 +60,7 @@ class BuildingId:
                                    queue='yfsd_construction',
                                    )
         self.channel.start_consuming()
+
 
 if __name__ == '__main__':
     b = BuildingId()

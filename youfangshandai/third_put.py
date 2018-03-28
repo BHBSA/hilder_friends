@@ -13,7 +13,7 @@ pool_list = []
 
 class HouseId(object):
     # 建立实例，声明管道，声明队列
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.0.235', ))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.0.235', port=5673))
     channel = connection.channel()
     channel.queue_declare(queue='yfsd_building')
     # 设置代理IP
@@ -59,9 +59,7 @@ class HouseId(object):
                     print("NO RESULT:", result)
                 ch.basic_ack(delivery_tag=method.delivery_tag)
             except Exception as e:
-                print(e,buildingId)
-
-
+                print(e, buildingId)
 
     def consume_start(self):
         pool_list.append(os.getpid())

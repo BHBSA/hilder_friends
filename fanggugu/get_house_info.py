@@ -25,7 +25,7 @@ class GetHouse(object):
 
     def start_house_info(self, ch, method, properties, body):
         user_name = method.consumer_tag
-        jrbqiantai = coll_login.find({'user_name': user_name})
+        jrbqiantai = coll_login.find_one({'user_name': user_name})['jrbqiantai']
         headers = {
             'Cookie': 'jrbqiantai=' + jrbqiantai,
             'Referer': 'http://www.fungugu.com/JinRongGuZhi/toJinRongGuZhi_s?xqmc=DongHuVillas&gjdx=DongHuVillas&residentialName=&realName=&dz=&xzq=%E9%95%BF%E5%AE%81%E5%8C%BA&xqid=22013&ldid=&dyid=&hid=&loudong=&danyuan=&hu=&retrievalMethod=%E6%99%AE%E9%80%9A%E6%A3%80%E7%B4%A2',
@@ -47,25 +47,26 @@ class GetHouse(object):
 
                 data = {"app_name": 'fgg'}
                 try:
-                    ip = requests.post(url='http://192.168.10.85:8999/get_one_proxy', data=data).text
+                    ip = requests.post(url='http://192.168.0.235:8999/get_one_proxy', data=data).text
                     proxies = {'http': ip}
+                    print(ip)
                 except Exception as e:
                     print(e)
                 try:
                     response = requests.post(url=url, headers=headers, params=params,
-                                             proxies=proxies)
+                                             proxies=proxies, timeout=5)
                     print(response.text)
                     # 登录失效，重新登录
                     if 'login' in response.text:
                         jrbqiantai = self.login.update_mongo(user_name)
                         headers['Cookie'] = 'jrbqiantai=' + jrbqiantai
                         response = requests.post(url=url, headers=headers, params=params,
-                                                 proxies=proxies)
+                                                 proxies=proxies, timeout=5)
+                        print(response.text)
                     break
                 except Exception as e:
-                    print(e)
                     formdata = {"app_name": 'fgg', "status_code": 1, "ip": ip}
-                    response = requests.post(url='http://192.168.10.85:8999/send_proxy_status', data=formdata)
+                    response = requests.post(url='http://192.168.0.235:8999/send_proxy_status', data=formdata)
                     status = response.text
                     print('更新' + status)
 
@@ -89,7 +90,7 @@ class GetHouse(object):
                     }
                     print(data)
                     coll_insert.insert_one(data)
-                ch.basic_ack(delivery_tag=method.delivery_tag)
+                    ch.basic_ack(delivery_tag=method.delivery_tag)
             else:
                 channel.basic_publish(exchange='',
                                       routing_key='fgg_building_id',
@@ -112,9 +113,6 @@ class GetHouse(object):
 
 
 if __name__ == '__main__':
-    login = Login()
-    status = login.put_mongo()
-    print(status)
     house = GetHouse()
     for i in coll_user.find():
         user_name = i['user_name']

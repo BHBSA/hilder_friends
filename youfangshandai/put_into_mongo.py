@@ -2,7 +2,8 @@ import pika
 import pymongo
 import json
 import random
-connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.0.235'))
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.0.235', 5673))
 channel = connection.channel()
 coll = pymongo.MongoClient('192.168.0.235', 27017)['friends'].get_collection('yfsd')
 channel.queue_declare(queue='yfsd_house')
@@ -24,7 +25,7 @@ def start_consume():
     # 类似权重，按能力分发，如果有一个消息，就不在给你发
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(callback,
-                          queue='yfsd_house',)
+                          queue='yfsd_house', )
     channel.start_consuming()
 
 
