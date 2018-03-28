@@ -7,7 +7,7 @@ import certifi
 class Construction(object):
     def __init__(self):
         # 建立实例，声明管道，声明队列
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.0.235', ))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.0.235', port=5673))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue='yfsd_construction')
         self.city_dict = {
@@ -43,7 +43,7 @@ class Construction(object):
                 data = {'keyworks': '', 'pageNo': '1', 'pageSize': '100000'}
                 city_url = self.city_dict[city]
                 url = city_url + '/wxp/yfsd/queryBuildingByPage'
-                response = requests.post(url=url,data=data,headers=self.headers,verify=False)
+                response = requests.post(url=url, data=data, headers=self.headers, verify=False)
                 constructionId_info = json.loads(response.text)
                 for con in constructionId_info['resultData']:
                     """
