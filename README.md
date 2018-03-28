@@ -1,9 +1,7 @@
-**How to run?**
---
-**where are save**
+**数据库存储地址以及字段**
 --
 + <h5>优房闪贷：
-192.168.0.235，库：friends，表：yfsd
+192.168.0.235 库：friends 表：yfsd
 + 字段：
     + houseId  == 房号id
     + houseName  ==  房号名字
@@ -22,9 +20,10 @@
     + areaName  ==  null
     + conArrea  ==  null
     + city  ==  城市
+    
 ---
 <h5>上海物业：
-192.168.0.235，库：wuye，表：
+192.168.0.235 库：wuye 表：
 + wuye_house_info
 + 字段
     + hou_no  ==  房号
@@ -50,9 +49,10 @@
         + 2
         + 3
     + flag  ==  标识符
+    
 ---
 <h5>房估估：
-192.168.0.235，库：friends，表：
+192.168.0.235 库：friends 表：
 + fanggugu_house
 + 字段
     + house_id  ==  房间id                
@@ -86,6 +86,8 @@
 
 <h4>优房闪贷，房估估，上海物业
 
+**How to run?**
+--
 python run.py
 
 
