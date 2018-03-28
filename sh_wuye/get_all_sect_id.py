@@ -19,10 +19,12 @@ def connect_rabbit(host, queue):
 wuye_coll = connect_mongodb('192.168.0.235', 27017, 'wuye', 'wuye_sect_id')
 channel = connect_rabbit('192.168.0.235', 'wuye_sect_id')
 
-for i in wuye_coll.find():
-    sect_id = i['_id']
-    print(sect_id)
-    channel.basic_publish(exchange='',
-                          routing_key='wuye_sect_id',
-                          body=str(sect_id),
-                          )
+
+def produce():
+    for i in wuye_coll.find():
+        sect_id = i['_id']
+        print(sect_id)
+        channel.basic_publish(exchange='',
+                              routing_key='wuye_sect_id',
+                              body=str(sect_id),
+                              )
