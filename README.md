@@ -52,7 +52,7 @@
     
 ---
 <h5>房估估：
-192.168.0.235 库：friends 表：
+192.168.0.235，库：fgg 表：
 + fanggugu_house
 + 字段
     + house_id  ==  房间id                
