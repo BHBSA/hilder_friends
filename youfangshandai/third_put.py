@@ -6,7 +6,7 @@ import certifi
 import time
 import random
 import os
-import psutil
+
 
 pool_list = []
 
