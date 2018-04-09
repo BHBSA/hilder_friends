@@ -60,7 +60,6 @@ class GetBuild(object):
                     response = requests.post(url='http://192.168.0.235:8999/send_proxy_status', data=formdata)
                     status = response.text
                     print(status)
-            print(result.text)
             if 'true' in result.text or 'True' in result.text:
                 building_list = json.loads(result.text)['list']
                 if not building_list:
