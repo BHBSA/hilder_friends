@@ -85,6 +85,8 @@ class GetBuild(object):
                     coll_insert.insert_one(data)
                 ch.basic_ack(delivery_tag=method.delivery_tag)
             else:
+                formdata = {"app_name": 'fgg', "status_code": 1, "ip": ip}
+                requests.post(url='http://192.168.0.235:8999/send_proxy_status', data=formdata)
                 channel.basic_publish(exchange='',
                                       routing_key='fgg_community_id',
                                       body=body,
