@@ -1,3 +1,7 @@
+"""
+从235，fgg，fanggugu_price库中查小区id,城市名字
+放入队列235，fgg_community_id
+"""
 import pymongo
 import pika
 import json

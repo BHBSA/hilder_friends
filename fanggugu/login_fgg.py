@@ -1,5 +1,17 @@
 import requests
 from lib.mongo import Mongo
+import random
+
+# IPS = ["192.168.0.90:4234",
+#        "192.168.0.93:4234",
+#        "192.168.0.94:4234",
+#        "192.168.0.96:4234",
+#        "192.168.0.98:4234",
+#        "192.168.0.99:4234",
+#        "192.168.0.100:4234",
+#        "192.168.0.101:4234",
+#        "192.168.0.102:4234",
+#        "192.168.0.103:4234"]
 
 
 class Login(object):
@@ -13,13 +25,15 @@ class Login(object):
                  'pwd_login_password': '4ac9fa21a775e4239e4c72317cdca870',
                  'remembermeVal': 0}
         while True:
+            # 请求ip
             data = {"app_name": 'fgg'}
             ip = requests.post(url='http://192.168.0.235:8999/get_one_proxy', data=data).text
             print(ip)
+            # ip = random.choice(IPS)
             proxies = {'http': ip}
             try:
-                s.get(url='http://www.fungugu.com/DengLu/doLogin_noLogin', params=parms,
-                      proxies=proxies, timeout=5)
+                s.post(url='http://www.fungugu.com/DengLu/doLogin_noLogin', data=parms,
+                       proxies=proxies, timeout=5)
                 jrbqiantai = s.cookies.get_dict()['jrbqiantai']
                 return jrbqiantai
             except Exception as e:
