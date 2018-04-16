@@ -86,10 +86,6 @@
 
 <h4>优房闪贷，房估估，上海物业
 
-**How to run?**
---
-python run.py
-
 
 
 
