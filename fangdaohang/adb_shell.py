@@ -5,7 +5,7 @@ import time
 
 class AutoAdb:
     def __init__(self):
-        adb_path = os.path.join('C:\\Users\\user\\Downloads\\adb')
+        adb_path = os.path.join('adb')
         print(adb_path)
         try:
             subprocess.Popen(
@@ -70,20 +70,11 @@ class AutoAdb:
 
 if __name__ == '__main__':
     c = AutoAdb()
-    # c.run('shell input keyevent 4')  # 退出
-    # c.run('shell input tap 800 560')  # 点击一次列表页
-    # c.run('shell input tap 570 700')  # 点击一次详情页
-    # c.run('shell input keyevent 4')  # 退出
-    # c.run('shell input keyevent 4')  # 退出
     while True:
-        # c.run('shell input tap 800 560')  # 点击一次列表页
-        # c.run('shell input tap 570 700')  # 点击一次详情页
-        # c.run('shell input keyevent 4')  # 退出
-        # c.run('shell input keyevent 4')  # 退出
-        c.run('shell input swipe 523 1624 523 1260')
-        c.run('shell input tap 800 560')  # 点击一次列表页
+        c.run('shell input swipe 400 817 400 580')
+        c.run('shell input tap 570 380')  # 点击一次列表页
         time.sleep(1)
-        c.run('shell input tap 570 700')  # 点击一次详情页
+        c.run('shell input tap 360 470')  # 点击一次详情页
         time.sleep(1)
         c.run('shell input keyevent 4')  # 退出
         time.sleep(1)
