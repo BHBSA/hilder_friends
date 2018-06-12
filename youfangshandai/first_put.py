@@ -7,7 +7,7 @@ import certifi
 class Construction(object):
     def __init__(self):
         # 建立实例，声明管道，声明队列
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.0.235', port=5673))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.0.190', port=5673))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue='yfsd_construction')
         self.city_dict = {

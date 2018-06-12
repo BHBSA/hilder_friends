@@ -3,9 +3,9 @@ import pymongo
 import json
 import random
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.0.235', 5673))
+connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.0.190', 5673))
 channel = connection.channel()
-coll = pymongo.MongoClient('192.168.0.235', 27017)['friends'].get_collection('yfsd')
+coll = pymongo.MongoClient('192.168.0.235', 27017)['friends'].get_collection('yfsd_April')
 channel.queue_declare(queue='yfsd_house')
 count = 0
 
