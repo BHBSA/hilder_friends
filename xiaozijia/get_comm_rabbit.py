@@ -7,17 +7,24 @@ from lib.log import LogHandler
 from lib.mongo import Mongo
 from lib.rabbitmq import Rabbit
 import requests
+import yaml
+import json
 
-log = LogHandler('小资家_fast')
+log = LogHandler('小资家_comm')
+
+setting = yaml.load(open('config.yaml'))
 
 # mongo
-m = Mongo('192.168.0.235', 27017)
-coll_comm = m.connect['friends']['xiaozijia_comm_fast']
+m = Mongo(setting['xiaozijia']['mongo']['host'], setting['xiaozijia']['mongo']['port'])
+coll_comm = m.connect[setting['xiaozijia']['mongo']['db']][setting['xiaozijia']['mongo']['comm_coll']]
 
 # rabbit
-r = Rabbit('192.168.0.190', 5673)
+r = Rabbit(setting['xiaozijia']['rabbit']['host'], setting['xiaozijia']['rabbit']['port'])
 channel = r.get_channel()
-channel.queue_declare(queue='xiaozijia_num')
+queue = setting['xiaozijia']['rabbit']['queue']['xiaozijia_num']
+build_queue = setting['xiaozijia']['rabbit']['queue']['xiaozijia_build']
+channel.queue_declare(queue=queue)
+channel.queue_declare(queue=build_queue)
 
 
 def get_comm_info(ch, method, properties, body):
@@ -33,8 +40,17 @@ def get_comm_info(ch, method, properties, body):
     try:
         response = requests.get(comm_url)
         html_json = response.json()
+        ConstructionId = html_json['ConstructionId']
+        is_ex = coll_comm.find_one({'ConstructionId': ConstructionId})
+        if is_ex:
+            log.info('小区存在，url="{}"'.format(comm_url))
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+            return
+        channel.basic_publish(exchange='',
+                              routing_key=build_queue,
+                              body=json.dumps(html_json))
         coll_comm.insert_one(html_json)
-        print(html_json)
+        log.info('插入一条小区数据,data={}'.format(html_json))
     except Exception as e:
         log.error('请求错误，url="{}"'.format(comm_url, e))
     ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -42,12 +58,13 @@ def get_comm_info(ch, method, properties, body):
 
 def consume_queue():
     channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(consumer_callback=get_comm_info, queue='xiaozijia_num')
+    channel.basic_consume(consumer_callback=get_comm_info, queue=queue)
     channel.start_consuming()
 
 
 if __name__ == '__main__':
     from multiprocessing import Process
+
     for i in range(10):
         Process(target=consume_queue).start()
     # consume_queue()
