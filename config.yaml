@@ -1,6 +1,6 @@
 sh_wuye:
     rabbit:
-        host: '127.0.0.1'
+        host: localhost
         port: 5673
         queue:
             key_name: 'key_name'
@@ -19,14 +19,13 @@ sh_wuye:
         detail_coll: 'wuye_sect_detail_new'
 xiaozijia:
     rabbit:
-        host: '127.0.0.1'
+        host: localhost
         port: 5673
         queue:
             xiaozijia_num: 'xiaozijia_num'
             xiaozijia_build: 'xiaozijia_build'
             xiaozijia_house: 'xiaozijia_house'
             xiaozijia_house_detail: 'xiaozijia_house_detail'
-
 
     mongo:
         host: '114.80.150.196'
