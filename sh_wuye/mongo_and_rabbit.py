@@ -44,7 +44,7 @@ class Monbbit():
             try:
                 for args in self.args:
                     self.data[args] = i[args]
-                print(self.data)
+                # print(self.data)
                 channel.basic_publish(exchange='',
                                       routing_key=self.queue,
                                       body=json.dumps(self.data))
