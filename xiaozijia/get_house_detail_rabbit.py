@@ -5,7 +5,7 @@
 from lib.log import LogHandler
 from lib.mongo import Mongo
 from lib.rabbitmq import Rabbit
-from xiaozijia.user_headers import headers
+from xiaozijia.user_headers import get_headers
 import requests
 import json
 import yaml
@@ -24,6 +24,8 @@ channel = r.get_channel()
 detail_queue = setting['xiaozijia']['rabbit']['queue']['xiaozijia_house_detail']
 channel.queue_declare(queue=detail_queue)
 
+
+headers = get_headers()
 
 def get_house_info(ch, method, properties, body):
     """
@@ -56,6 +58,8 @@ def get_house_info(ch, method, properties, body):
         log.info('插入一个数据，data="{}"'.format(html_json))
 
     except Exception as e:
+        global headers
+        headers = get_headers()
         log.error('请求错误，url="{}",BuildName="{}",ConstructionName="{}",Id="{}",e="{}"'
                   .format(detail_url, BuildName, ConstructionName, Id, e))
         channel.basic_publish(exchange='',

@@ -9,7 +9,7 @@ from lib.rabbitmq import Rabbit
 import requests
 import json
 import yaml
-from xiaozijia.user_headers import headers
+from xiaozijia.user_headers import get_headers
 
 log = LogHandler('小资家_build')
 
@@ -27,6 +27,7 @@ house_queue = setting['xiaozijia']['rabbit']['queue']['xiaozijia_house']
 channel.queue_declare(queue=build_queue)
 channel.queue_declare(queue=house_queue)
 
+headers = get_headers()
 
 
 def get_build_info(ch, method, properties, body):
@@ -38,6 +39,7 @@ def get_build_info(ch, method, properties, body):
     :param body:
     :return:
     """
+
     body_json = json.loads(body.decode())
     ConstructionPhaseId = body_json['ConstructionPhaseId']
     ConstructionName = body_json['ConstructionName']
@@ -58,8 +60,13 @@ def get_build_info(ch, method, properties, body):
             log.info(i)
 
     except Exception as e:
+        global headers
+        headers = get_headers()
         log.error('请求错误，url="{}",ConstructionPhaseId="{}",ConstructionName="{}",ConstructionId="{}",e="{}"'
                   .format(build_url, ConstructionPhaseId, ConstructionName, ConstructionId, e))
+        channel.basic_publish(exchange='',
+                              routing_key=get_build_info,
+                              body=body)
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
