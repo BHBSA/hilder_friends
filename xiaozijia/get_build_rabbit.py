@@ -16,7 +16,8 @@ log = LogHandler('小资家_build')
 setting = yaml.load(open('config.yaml'))
 
 # mongo
-m = Mongo(setting['xiaozijia']['mongo']['host'], setting['xiaozijia']['mongo']['port'])
+m = Mongo(setting['xiaozijia']['mongo']['host'], setting['xiaozijia']['mongo']['port'],
+          user_name=setting['xiaozijia']['mongo']['user_name'], password=setting['xiaozijia']['mongo']['password'])
 coll_build = m.connect[setting['xiaozijia']['mongo']['db']][setting['xiaozijia']['mongo']['build_coll']]
 
 # rabbit
@@ -39,7 +40,7 @@ def get_build_info(ch, method, properties, body):
     :param body:
     :return:
     """
-
+    global headers
     body_json = json.loads(body.decode())
     ConstructionPhaseId = body_json['ConstructionPhaseId']
     ConstructionName = body_json['ConstructionName']
@@ -60,7 +61,6 @@ def get_build_info(ch, method, properties, body):
             log.info(i)
 
     except Exception as e:
-        global headers
         headers = get_headers()
         log.error('请求错误，url="{}",ConstructionPhaseId="{}",ConstructionName="{}",ConstructionId="{}",e="{}"'
                   .format(build_url, ConstructionPhaseId, ConstructionName, ConstructionId, e))

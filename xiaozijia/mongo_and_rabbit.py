@@ -29,7 +29,7 @@ class Monbbit():
         self.data = {}
 
     def connect_mongo(self):
-        m = Mongo(self.m_host, self.m_port)
+        m = Mongo(self.m_host, self.m_port,user_name='fangjia',password='fangjia123456')
         return m.connect[self.db][self.coll]
 
     def connect_rabbit(self):
@@ -54,7 +54,7 @@ class Monbbit():
 
 
 if __name__ == '__main__':
-    m = Monbbit('wuye', 'key_name', 'key_name', '_id',
+    m = Monbbit('friends', 'xiaozijia_build_fast_copy', 'xiaozijia_build', 'ConstructionId', 'IdSub',
                 m_host='114.80.150.196', r_host='127.0.0.1'
                 )
     m.put_rabbit()

@@ -15,7 +15,8 @@ log = LogHandler('小资家_comm')
 setting = yaml.load(open('config.yaml'))
 
 # mongo
-m = Mongo(setting['xiaozijia']['mongo']['host'], setting['xiaozijia']['mongo']['port'])
+m = Mongo(setting['xiaozijia']['mongo']['host'], setting['xiaozijia']['mongo']['port'],
+          user_name=setting['xiaozijia']['mongo']['user_name'], password=setting['xiaozijia']['mongo']['password'])
 coll_comm = m.connect[setting['xiaozijia']['mongo']['db']][setting['xiaozijia']['mongo']['comm_coll']]
 
 # rabbit

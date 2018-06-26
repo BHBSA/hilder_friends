@@ -15,7 +15,8 @@ log = LogHandler('小资家_detail_fast')
 setting = yaml.load(open('config.yaml'))
 
 # mongo
-m = Mongo(setting['xiaozijia']['mongo']['host'], setting['xiaozijia']['mongo']['port'])
+m = Mongo(setting['xiaozijia']['mongo']['host'], setting['xiaozijia']['mongo']['port'],
+          user_name=setting['xiaozijia']['mongo']['user_name'], password=setting['xiaozijia']['mongo']['password'])
 coll_detail = m.connect[setting['xiaozijia']['mongo']['db']][setting['xiaozijia']['mongo']['detail_coll']]
 
 # rabbit
@@ -36,6 +37,7 @@ def get_house_info(ch, method, properties, body):
     :param body:
     :return:
     """
+    global headers
     body_json = json.loads(body.decode())
     ConstructionName = body_json['ConstructionName']
     BuildName = body_json['BuildName']
@@ -58,7 +60,6 @@ def get_house_info(ch, method, properties, body):
         log.info('插入一个数据，data="{}"'.format(html_json))
 
     except Exception as e:
-        global headers
         headers = get_headers()
         log.error('请求错误，url="{}",BuildName="{}",ConstructionName="{}",Id="{}",e="{}"'
                   .format(detail_url, BuildName, ConstructionName, Id, e))
