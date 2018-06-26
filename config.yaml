@@ -10,8 +10,10 @@ sh_wuye:
 
     mongo:
         host: '114.80.150.196'
-        port: 27017
+        port: 27777
         db: 'wuye'
+        user_name: 'fangjia'
+        password: 'fangjia123456'
         key_name_coll: 'key_name'
         sect_coll: 'wuye_sect_id_new'
         build_coll: 'wuye_building_new'
@@ -30,8 +32,10 @@ xiaozijia:
 
     mongo:
         host: '114.80.150.196'
-        port: 27017
+        port: 27777
         db: 'friends'
+        user_name: 'fangjia'
+        password: 'fangjia123456'
         comm_coll: 'xiaozijia_comm_fast_new'
         build_coll: 'xiaozijia_build_fast_new'
         house_coll: 'xiaozijia_house_fast_new'
