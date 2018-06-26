@@ -8,11 +8,11 @@ from multiprocessing import Process
 if __name__ == '__main__':
     # 放入1-35数字
     Process(target=put_rabbit).start()
-    for i in range(10):
-        Process(target=comm_sumer).start()
-    for i in range(10):
-        Process(target=build_sumer).start()
-    for i in range(30):
-        Process(target=house_sumer).start()
-    for i in range(30):
-        Process(target=detail_sumer).start()
+    # for i in range(10):
+    Process(target=comm_sumer).start()
+    # for i in range(10):
+    Process(target=build_sumer).start()
+    # for i in range(30):
+    Process(target=house_sumer).start()
+    # for i in range(30):
+    Process(target=detail_sumer).start()
