@@ -65,7 +65,7 @@ def get_build_info(ch, method, properties, body):
         log.error('请求错误，url="{}",ConstructionPhaseId="{}",ConstructionName="{}",ConstructionId="{}",e="{}"'
                   .format(build_url, ConstructionPhaseId, ConstructionName, ConstructionId, e))
         channel.basic_publish(exchange='',
-                              routing_key=get_build_info,
+                              routing_key=build_queue,
                               body=body)
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
