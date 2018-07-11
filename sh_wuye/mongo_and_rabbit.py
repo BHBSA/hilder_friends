@@ -16,7 +16,7 @@ class Monbbit():
             :param r_port(str): rabbit的端口
     """
 
-    def __init__(self, db, coll, queue, *args, m_host='192.168.0.235', m_port=27017, r_host='192.168.0.190',
+    def __init__(self, db, coll, queue, *args, m_host='192.168.0.235', m_port=27777, r_host='192.168.0.190',
                  r_port=5673):
         self.db = db
         self.coll = coll
@@ -29,7 +29,7 @@ class Monbbit():
         self.data = {}
 
     def connect_mongo(self):
-        m = Mongo(self.m_host, self.m_port)
+        m = Mongo(self.m_host, self.m_port, user_name='fangjia', password='fangjia123456')
         return m.connect[self.db][self.coll]
 
     def connect_rabbit(self):

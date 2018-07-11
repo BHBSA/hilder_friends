@@ -11,6 +11,8 @@ log = LogHandler('上海物业楼栋')
 
 def connect_mongodb(host, port, database, collection):
     client = pymongo.MongoClient(host, port)
+    db_auth = client.admin
+    db_auth.authenticate('fangjia', 'fangjia123456')
     db = client[database]
     coll = db.get_collection(collection)
     return coll

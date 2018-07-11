@@ -16,6 +16,8 @@ headers = {
 
 def connect_mongodb(host, port, database, collection):
     client = pymongo.MongoClient(host, port)
+    db_auth = client.admin
+    db_auth.authenticate('fangjia', 'fangjia123456')
     db = client[database]
     coll = db.get_collection(collection)
     return coll
@@ -41,11 +43,6 @@ channel = connect_rabbit(setting['sh_wuye']['rabbit']['host'], detail_queue)
 
 def callback(ch, method, properties, body):
     community_id = body.decode()
-    is_ex = sect_id_coll.find_one({'_id': int(community_id)})
-    if is_ex:
-        log.info('小区已存在，comm_id="{}"'.format(community_id))
-        ch.basic_ack(delivery_tag=method.delivery_tag)
-        return
     payload = "--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"sect_id\"\r\n\r\n{0}\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"au_id\"\r\n\r\n1801171076359845\r\n--0xKhTmLbOuNdArY\r\nContent-Disposition: form-data; name=\"au_name\"\r\n\r\n15021630956\r\n--0xKhTmLbOuNdArY--".format(
         community_id)
     try:

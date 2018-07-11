@@ -1,4 +1,8 @@
 import pymongo
+from lib.mongo import Mongo
+
+m = Mongo('114.80.150.196', 27777, user_name='fangjia', password='fangjia123456')
+key_coll = m.connect['wuye']['key_name']
 
 
 def connect_mongodb(host, port, database, collection):
@@ -9,8 +13,8 @@ def connect_mongodb(host, port, database, collection):
 
 
 set_ = set([])
-comm_coll = connect_mongodb('192.168.0.136', 27017, 'fangjia', 'seaweed')
-key_coll = connect_mongodb('192.168.0.235', 27017, 'wuye', 'key_name')
+comm_coll = connect_mongodb('114.80.150.198', 38888, 'fangjia', 'seaweed')
+# key_coll = connect_mongodb('114.80.150.196', 27777, 'wuye', 'key_name')
 list_ = comm_coll.find({'city': '上海'})
 count = 0
 for i in list_:
